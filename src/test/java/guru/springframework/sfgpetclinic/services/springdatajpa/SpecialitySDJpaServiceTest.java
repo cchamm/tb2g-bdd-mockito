@@ -17,7 +17,7 @@ import static org.mockito.BDDMockito.*;
 @ExtendWith(MockitoExtension.class)
 class SpecialitySDJpaServiceTest {
 
-    @Mock()
+    @Mock(lenient = true)
     SpecialtyRepository specialityRepository;
 
     @InjectMocks
@@ -45,7 +45,8 @@ class SpecialitySDJpaServiceTest {
 
         assertThat(foundSpecialty).isNotNull();
 
-        verify(specialityRepository).findById(anyLong());
+        // timeout is at most wait for 1000 millisecond
+        then(specialityRepository).should(timeout(1000)).findById(anyLong());
 
     }
 
@@ -89,7 +90,7 @@ class SpecialitySDJpaServiceTest {
         service.deleteById(1l);
 
         // Then
-        then(specialityRepository).should(atLeastOnce()).deleteById(1l);
+        then(specialityRepository).should(timeout(100).atLeastOnce()).deleteById(1l);
     }
 
     @Test
