@@ -7,10 +7,7 @@ import guru.springframework.sfgpetclinic.services.OwnerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
@@ -87,13 +84,18 @@ class OwnerControllerTest {
     @Test
     void processFindFormWildcardFoundMultiple() {
         // Given
+        var model = mock(Model.class);
         Owner owner = new Owner(1L, "Joe", "FindMe");
+        InOrder inOrder = inOrder(ownerService, model );
         // when
-        String viewName = controller.processFindForm(owner, mock(BindingResult.class), mock(Model.class));
+        String viewName = controller.processFindForm(owner, mock(BindingResult.class), model);
 
         // then
         assertThat((String) stringArgumentCaptor.getValue()).isEqualToIgnoringCase("%FindMe%");
         assertThat(viewName).isEqualToIgnoringCase("owners/ownersList");
+        // inorder asserts
+        inOrder.verify(ownerService).findAllByLastNameLike(anyString());
+        inOrder.verify(model).addAttribute(anyString(), anyList());
     }
 
 
