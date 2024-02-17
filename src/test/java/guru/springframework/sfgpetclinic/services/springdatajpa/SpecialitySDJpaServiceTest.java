@@ -11,14 +11,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class SpecialitySDJpaServiceTest {
 
-    @Mock(lenient = true)
+    @Mock()
     SpecialtyRepository specialityRepository;
 
     @InjectMocks
@@ -196,6 +195,33 @@ class SpecialitySDJpaServiceTest {
         var  returnSavedSpeciality = service.save(speciality);
         // then
         assertNull(returnSavedSpeciality);
+        then(specialityRepository).should(atLeastOnce()).save(any(Speciality.class));
+
+    }
+
+
+    @Test
+    void testSaveLambdaNotMatchUsingAnswer() {
+        // given
+        final String MATCH_ME = "matchMe";
+        Speciality speciality = new Speciality();
+        speciality.setDescription("not match");
+
+        Speciality savedSpeciality = new Speciality();
+        savedSpeciality.setId(1L);
+        when(specialityRepository.save(any())).thenAnswer(answer -> {
+            Speciality argument = answer.getArgument(0);
+            if (argument.getDescription().equals(MATCH_ME)) {
+                return savedSpeciality;
+            } else {
+                return new Speciality();
+            }
+        });
+
+        // when
+        var  returnSavedSpeciality = service.save(speciality);
+        // then
+        assertNotNull(returnSavedSpeciality);
         then(specialityRepository).should(atLeastOnce()).save(any(Speciality.class));
 
     }
