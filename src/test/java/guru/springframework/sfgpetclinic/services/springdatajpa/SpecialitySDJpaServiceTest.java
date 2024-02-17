@@ -26,11 +26,14 @@ class SpecialitySDJpaServiceTest {
 
     @Test
     void testDeleteByObject() {
+        // Given
         Speciality speciality = new Speciality();
 
+        // When
         service.delete(speciality);
 
-        verify(specialtyRepository).delete(any(Speciality.class));
+        // then
+        then(specialtyRepository).should().delete(any(Speciality.class));
     }
 
     @Test
@@ -69,40 +72,60 @@ class SpecialitySDJpaServiceTest {
 
     @Test
     void deleteById() {
+        // Give - None
+
+        // When
         service.deleteById(1l);
         service.deleteById(1l);
 
-        verify(specialtyRepository, times(2)).deleteById(1l);
+        // Then
+        then(specialtyRepository).should(times(2)).deleteById(1l);
     }
 
     @Test
     void deleteByIdAtLeast() {
+        // Given - None
+        // When
         service.deleteById(1l);
         service.deleteById(1l);
 
-        verify(specialtyRepository, atLeastOnce()).deleteById(1l);
+        // Then
+        then(specialtyRepository).should(atLeastOnce()).deleteById(1l);
     }
 
     @Test
     void deleteByIdAtMost() {
+        // Given - None
+
+        // When
         service.deleteById(1l);
         service.deleteById(1l);
 
-        verify(specialtyRepository, atMost(5)).deleteById(1l);
+        // Then
+        then(specialtyRepository).should(atMost(5)).deleteById(1L);
     }
 
     @Test
     void deleteByIdNever() {
+        // Given - None
+
+        // When
         service.deleteById(1l);
         service.deleteById(1l);
 
-        verify(specialtyRepository, atLeastOnce()).deleteById(1l);
 
-        verify(specialtyRepository, never()).deleteById(5L);
+        // Then
+        then(specialtyRepository).should(atLeastOnce()).deleteById(1l);
+
+        then(specialtyRepository).should(never()).deleteById(5L);
     }
 
     @Test
     void testDelete() {
+        // when
         service.delete(new Speciality());
+
+        // then
+        then(specialtyRepository).should().delete(any(Speciality.class));
     }
 }
