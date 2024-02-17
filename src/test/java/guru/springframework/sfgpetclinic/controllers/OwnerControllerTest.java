@@ -77,6 +77,7 @@ class OwnerControllerTest {
         String viewName = controller.processFindForm(owner, mock(BindingResult.class), null);
 
         // then
+        then(ownerService).shouldHaveNoMoreInteractions();
         assertThat((String) stringArgumentCaptor.getValue()).isEqualToIgnoringCase("%DontFindMe%");
         assertThat(viewName).isEqualToIgnoringCase("owners/findOwners");
     }
@@ -96,6 +97,7 @@ class OwnerControllerTest {
         // inorder asserts
         inOrder.verify(ownerService).findAllByLastNameLike(anyString());
         inOrder.verify(model).addAttribute(anyString(), anyList());
+        then(model).shouldHaveNoMoreInteractions();
     }
 
 
