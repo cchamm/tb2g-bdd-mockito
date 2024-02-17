@@ -11,13 +11,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class SpecialitySDJpaServiceTest {
 
-    @Mock
+    @Mock(lenient = true)
     SpecialtyRepository specialityRepository;
 
     @InjectMocks
@@ -158,5 +159,44 @@ class SpecialitySDJpaServiceTest {
         assertThrows(RuntimeException.class, () -> service.delete(new Speciality()));
 
         then(specialityRepository).should().delete(any(Speciality.class));
+    }
+
+    // Java 8 Lambda Argument Matches
+    @Test
+    void testSaveLambda() {
+        // given
+        final String MATCH_ME = "matchMe";
+        Speciality speciality = new Speciality();
+        speciality.setDescription(MATCH_ME);
+
+        Speciality savedSpeciality = new Speciality();
+        savedSpeciality.setId(1L);
+        when(specialityRepository.save(argThat(argument -> argument.getDescription().equals(MATCH_ME)))).thenReturn(savedSpeciality);
+
+        // when
+        var  returnSavedSpeciality = service.save(speciality);
+        // then
+        assertThat(returnSavedSpeciality.getId()).isEqualTo(1L);
+        then(specialityRepository).should(atLeastOnce()).save(any(Speciality.class));
+
+    }
+
+    @Test
+    void testSaveLambdaNotMatch() {
+        // given
+        final String MATCH_ME = "matchMe";
+        Speciality speciality = new Speciality();
+        speciality.setDescription("not match");
+
+        Speciality savedSpeciality = new Speciality();
+        savedSpeciality.setId(1L);
+        when(specialityRepository.save(argThat(argument -> argument.getDescription().equals(MATCH_ME)))).thenReturn(savedSpeciality);
+
+        // when
+        var  returnSavedSpeciality = service.save(speciality);
+        // then
+        assertNull(returnSavedSpeciality);
+        then(specialityRepository).should(atLeastOnce()).save(any(Speciality.class));
+
     }
 }
